@@ -8,47 +8,55 @@ library(cowplot)
 # cohort 2 (control):  36051 36178 35309 35965
 
 # load the datasets and create integrated dataset
-bn36181.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_36181/")
-bn36181 <- CreateSeuratObject(counts = bn36181.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn36181[["bn"]] <- "bn36181"
+  bn36181.data <- Read10X(data.dir = "./data/Bn_36181/")
+  bn36181 <- CreateSeuratObject(counts = bn36181.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn36181[["bn"]] <- "bn36181"
+  bn36181[["cohort"]] <- "anti-CD8"
 
-bn36201.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_36201/")
-bn36201 <- CreateSeuratObject(counts = bn36201.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn36201[["bn"]] <- "bn36201"
+  bn36201.data <- Read10X(data.dir = "./data/Bn_36201/")
+  bn36201 <- CreateSeuratObject(counts = bn36201.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn36201[["bn"]] <- "bn36201"
+  bn36201[["cohort"]] <- "anti-CD8"
 
-bn36310.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_36310/")
-bn36310 <- CreateSeuratObject(counts = bn36310.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn36310[["bn"]] <- "bn36310"
+  bn36310.data <- Read10X(data.dir = "./data/Bn_36310/")
+  bn36310 <- CreateSeuratObject(counts = bn36310.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn36310[["bn"]] <- "bn36310"
+  bn36310[["cohort"]] <- "anti-CD8"
 
-bn35289.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_35289/")
-bn35289 <- CreateSeuratObject(counts = bn35289.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn35289[["bn"]] <- "bn35289"
+  bn35289.data <- Read10X(data.dir = "./data/Bn_35289/")
+  bn35289 <- CreateSeuratObject(counts = bn35289.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn35289[["bn"]] <- "bn35289"
+  bn35289[["cohort"]] <- "anti-CD8"
 
-bn36051.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_36051/")
-bn36051 <- CreateSeuratObject(counts = bn36051.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn36051[["bn"]] <- "bn36051"
+  bn36051.data <- Read10X(data.dir = "./data/Bn_36051/")
+  bn36051 <- CreateSeuratObject(counts = bn36051.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn36051[["bn"]] <- "bn36051"
+  bn36051[["cohort"]] <- "control"
 
-bn36178.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_36178/")
-bn36178 <- CreateSeuratObject(counts = bn36178.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn36178[["bn"]] <- "bn36178"
+  bn36178.data <- Read10X(data.dir = "./data/Bn_36178/")
+  bn36178 <- CreateSeuratObject(counts = bn36178.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn36178[["bn"]] <- "bn36178"
+  bn36178[["cohort"]] <- "control"
 
-bn35309.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_35309/")
-bn35309 <- CreateSeuratObject(counts = bn35309.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn35309[["bn"]] <- "bn35309"
+  bn35309.data <- Read10X(data.dir = "./data/Bn_35309/")
+  bn35309 <- CreateSeuratObject(counts = bn35309.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn35309[["bn"]] <- "bn35309"
+  bn35309[["cohort"]] <- "control"
 
-bn35965.data <- Read10X(data.dir = "../data/1728PC/filtered_gene_bc_matrices/Bn_35965/")
-bn35965 <- CreateSeuratObject(counts = bn35965.data, project = "1728PC",
-                              min.cells = 3, min.features = 200)
-bn35965[["bn"]] <- "bn35965"
+  bn35965.data <- Read10X(data.dir = "./data/Bn_35965/")
+  bn35965 <- CreateSeuratObject(counts = bn35965.data, project = "1728PC",
+                                min.cells = 3, min.features = 200)
+  bn35965[["bn"]] <- "bn35965"
+  bn35965[["cohort"]] <- "control"
 
-bn.list <- list(bn36051 = bn36051, bn36181 = bn36181)
+  bn.list <- list(bn36051 = bn36051, bn36181 = bn36181)
 
 # Normalize datasets individually by SCTransform(), instead of NormalizeData()
 bn.list <- lapply(X = bn.list, FUN = SCTransform)
