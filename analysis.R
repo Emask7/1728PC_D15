@@ -56,7 +56,16 @@ library(cowplot)
   bn35965[["bn"]] <- "bn35965"
   bn35965[["cohort"]] <- "control"
 
-  bn.list <- list(bn36051 = bn36051, bn36181 = bn36181)
+
+# not sure how to organize bn.list yet
+  bn.list <- list(bn36181 = bn36181, bn36201 = bn36201,
+                  bn36310 = bn36310, bn35289 = bn35289,
+                  bn36051 = bn36051, bn36178 = bn36178,
+                  bn35309 = bn35309, bn35965 = bn35965)
+
+  bn.list <- list(antiCD8 = c(bn36181, bn36201, bn36310, bn35289),
+                  control = c(bn36051, bn36178, bn35309, bn35965))
+
 
 # Normalize datasets individually by SCTransform(), instead of NormalizeData()
 bn.list <- lapply(X = bn.list, FUN = SCTransform)
