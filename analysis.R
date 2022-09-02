@@ -1,83 +1,104 @@
 library(dplyr)
+library(foreach)
 library(Seurat)
 library(patchwork)
 library(ggplot2)
 library(cowplot)
 
+# to save/load the R envitonment
+  save.image(file='myEnvironment.RData')
+  load('myEnvironment.RData')
+
 # cohort 1 (anti-CD8): 36181 36201 35310 35289
 # cohort 2 (control):  36051 36178 35309 35965
 
 # load the datasets and create integrated dataset
-  bn36181.data <- Read10X(data.dir = "./data/Bn_36181/")
-  bn36181 <- CreateSeuratObject(counts = bn36181.data, project = "1728PC",
+  bn36181 <- Read10X(data.dir = "./data/Bn_36181/")
+  rownames(bn36181) <- gsub("_", "-", rownames(bn36181))
+  bn36181 <- CreateSeuratObject(counts = bn36181, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn36181[["bn"]] <- "bn36181"
   bn36181[["cohort"]] <- "anti-CD8"
 
-  bn36201.data <- Read10X(data.dir = "./data/Bn_36201/")
-  bn36201 <- CreateSeuratObject(counts = bn36201.data, project = "1728PC",
+  bn36201 <- Read10X(data.dir = "./data/Bn_36201/")
+  rownames(bn36201) <- gsub("_", "-", rownames(bn36201))
+  bn36201 <- CreateSeuratObject(counts = bn36201, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn36201[["bn"]] <- "bn36201"
   bn36201[["cohort"]] <- "anti-CD8"
 
-  bn36310.data <- Read10X(data.dir = "./data/Bn_36310/")
-  bn36310 <- CreateSeuratObject(counts = bn36310.data, project = "1728PC",
+  bn35310 <- Read10X(data.dir = "./data/Bn_35310/")
+  rownames(bn35310) <- gsub("_", "-", rownames(bn35310))
+  bn35310 <- CreateSeuratObject(counts = bn35310, project = "1728PC",
                                 min.cells = 3, min.features = 200)
-  bn36310[["bn"]] <- "bn36310"
-  bn36310[["cohort"]] <- "anti-CD8"
+  bn35310[["bn"]] <- "bn35310"
+  bn35310[["cohort"]] <- "anti-CD8"
 
-  bn35289.data <- Read10X(data.dir = "./data/Bn_35289/")
-  bn35289 <- CreateSeuratObject(counts = bn35289.data, project = "1728PC",
+  bn35289 <- Read10X(data.dir = "./data/Bn_35289/")
+  rownames(bn35289) <- gsub("_", "-", rownames(bn35289))
+  bn35289 <- CreateSeuratObject(counts = bn35289, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn35289[["bn"]] <- "bn35289"
   bn35289[["cohort"]] <- "anti-CD8"
 
-  bn36051.data <- Read10X(data.dir = "./data/Bn_36051/")
-  bn36051 <- CreateSeuratObject(counts = bn36051.data, project = "1728PC",
+  bn36051 <- Read10X(data.dir = "./data/Bn_36051/")
+  rownames(bn36051) <- gsub("_", "-", rownames(bn36051))
+  bn36051 <- CreateSeuratObject(counts = bn36051, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn36051[["bn"]] <- "bn36051"
   bn36051[["cohort"]] <- "control"
 
-  bn36178.data <- Read10X(data.dir = "./data/Bn_36178/")
-  bn36178 <- CreateSeuratObject(counts = bn36178.data, project = "1728PC",
+  bn36178 <- Read10X(data.dir = "./data/Bn_36178/")
+  rownames(bn36178) <- gsub("_", "-", rownames(bn36178))
+  bn36178 <- CreateSeuratObject(counts = bn36178, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn36178[["bn"]] <- "bn36178"
   bn36178[["cohort"]] <- "control"
 
-  bn35309.data <- Read10X(data.dir = "./data/Bn_35309/")
-  bn35309 <- CreateSeuratObject(counts = bn35309.data, project = "1728PC",
+  bn35309 <- Read10X(data.dir = "./data/Bn_35309/")
+  rownames(bn35309) <- gsub("_", "-", rownames(bn35309))
+  bn35309 <- CreateSeuratObject(counts = bn35309, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn35309[["bn"]] <- "bn35309"
   bn35309[["cohort"]] <- "control"
 
-  bn35965.data <- Read10X(data.dir = "./data/Bn_35965/")
-  bn35965 <- CreateSeuratObject(counts = bn35965.data, project = "1728PC",
+  bn35965 <- Read10X(data.dir = "./data/Bn_35965/")
+  rownames(bn35965) <- gsub("_", "-", rownames(bn35965))
+  bn35965 <- CreateSeuratObject(counts = bn35965, project = "1728PC",
                                 min.cells = 3, min.features = 200)
   bn35965[["bn"]] <- "bn35965"
   bn35965[["cohort"]] <- "control"
 
-
 # not sure how to organize bn.list yet
   bn.list <- list(bn36181 = bn36181, bn36201 = bn36201,
-                  bn36310 = bn36310, bn35289 = bn35289,
+                  bn35310 = bn35310, bn35289 = bn35289,
                   bn36051 = bn36051, bn36178 = bn36178,
                   bn35309 = bn35309, bn35965 = bn35965)
 
-  bn.list <- list(antiCD8 = c(bn36181, bn36201, bn36310, bn35289),
-                  control = c(bn36051, bn36178, bn35309, bn35965))
+  find.mt <- function(x) {
+    x <- PercentageFeatureSet(x, pattern = "^MT[0-9]", col.name = "percent.mt")
+    x <- SCTransform(x, vars.to.regress = "percent.mt", verbose = FALSE)
+    x
+  }
 
+  bn.list <- foreach(a = bn.list) %do% (find.mt(a))
+  rm(a)
 
 # Normalize datasets individually by SCTransform(), instead of NormalizeData()
-bn.list <- lapply(X = bn.list, FUN = SCTransform)
-features <- SelectIntegrationFeatures(object.list = bn.list, nfeatures = 3000)
+  features <- SelectIntegrationFeatures(object.list = bn.list, nfeatures = 3000)
 
 # Run the PrepSCTIntegration() function prior to identifying anchors
-bn.list <- PrepSCTIntegration(object.list = bn.list, anchor.features = features)
+  bn.list <- PrepSCTIntegration(object.list = bn.list, anchor.features = features)
 
 # Find integration anchors and integrate the data
-immune.anchors <- FindIntegrationAnchors(object.list = bn.list, normalization.method = "SCT",
-                                         anchor.features = features)
-immune.combined.sct <- IntegrateData(anchorset = immune.anchors, normalization.method = "SCT")
+  immune.anchors <- FindIntegrationAnchors(object.list = bn.list, normalization.method = "SCT",
+                                           anchor.features = features)
+  save.image(file='myEnvironment.RData')
+
+##### here #####
+  immune.combined.sct <- IntegrateData(anchorset = immune.anchors, normalization.method = "SCT")
+  save.image(file='myEnvironment.RData')
+
 
 # Perform an integrated analysis
 # specify that we will perform downstream analysis on the corrected data note that the
