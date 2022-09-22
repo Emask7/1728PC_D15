@@ -77,7 +77,7 @@ library(cowplot)
 
   find.mt <- function(x) {
     x <- PercentageFeatureSet(x, pattern = "^MT[0-9]", col.name = "percent.mt")
-    x <- SCTransform(x, vars.to.regress = "percent.mt", verbose = FALSE)
+    x <- SCTransform(x, method = "glmGamPoi", vars.to.regress = "percent.mt", verbose = FALSE)
     x
   }
 
@@ -87,17 +87,34 @@ library(cowplot)
 # Normalize datasets individually by SCTransform(), instead of NormalizeData()
   features <- SelectIntegrationFeatures(object.list = bn.list, nfeatures = 3000)
 
+# Reciprocal PCA
+  bn.list <- lapply(X = bn.list, FUN = function(x) {
+    x <- ScaleData(x, features = features, verbose = FALSE)
+    x <- RunPCA(x, features = features, verbose = FALSE)
+  })
+
 # Run the PrepSCTIntegration() function prior to identifying anchors
   bn.list <- PrepSCTIntegration(object.list = bn.list, anchor.features = features)
 
+  bn.list <- lapply(X = bn.list, FUN = RunPCA, features = features)
+  save.image(file='myEnvironment.rpca.prepSCT.RData')
+
 # Find integration anchors and integrate the data
   immune.anchors <- FindIntegrationAnchors(object.list = bn.list, normalization.method = "SCT",
-                                           anchor.features = features)
-  save.image(file='myEnvironment.RData')
-
+                                           anchor.features = features, dims = 1:30, reduction = "rpca", k.anchor = 20)
+  save.image(file='myEnvironment.rpca.foundAnchors.RData')
 ##### here #####
-  immune.combined.sct <- IntegrateData(anchorset = immune.anchors, normalization.method = "SCT")
-  save.image(file='myEnvironment.RData')
+
+  immune.combined.sct <- IntegrateData(anchorset = immune.anchors, normalization.method = "SCT", dims = 1:30)
+  save.image(file='myEnvironment.rpca.integrated.RData')
+
+
+
+
+
+
+
+
 
 
 # Perform an integrated analysis
