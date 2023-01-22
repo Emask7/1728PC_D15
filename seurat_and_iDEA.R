@@ -72,7 +72,7 @@ library(cowplot)
   cohort2 <- list(bn36051 = bn36051, bn36178 = bn36178,
                   bn35309 = bn35309, bn35965 = bn35965)
 
-  test <- list(bn36181 = bn36181, bn36201 = bn36201)
+  # test <- list(bn36181 = bn36181, bn36201 = bn36201)
 
 # Function to run Seurat integration analysis
   run_seurat <- function(data.list) {
@@ -101,12 +101,25 @@ library(cowplot)
       data.combined
   }
 
-test.combined <- run_seurat(test)
+# test.combined <- run_seurat(test)
 
-test.combined <- RunPCA(test.combined, verbose = FALSE)
-test.combined <- RunUMAP(test.combined, reduction = "pca", dims = 1:30)
+  cohort1.combined <- run_seurat(cohort1)
+  cohort1.combined <- RunPCA(cohort1.combined, verbose = FALSE)
+  cohort1.combined <- RunUMAP(cohort1.combined, reduction = "pca", dims = 1:30)
 
-p1 <- DimPlot(test.combined, reduction = "umap", group.by = "bn")
-p2 <- DimPlot(test.combined, reduction = "umap", group.by = "seurat_annotations", label = TRUE, repel = TRUE)
-p1
-p2
+  cohort2.combined <- run_seurat(cohort2)
+  cohort2.combined <- RunPCA(cohort2.combined, verbose = FALSE)
+  cohort2.combined <- RunUMAP(cohort2.combined, reduction = "pca", dims = 1:30)
+
+
+
+  p1 <- DimPlot(cohort1.combined, reduction = "umap", group.by = "bn")
+  p1
+
+# test.combined <- RunPCA(test.combined, verbose = FALSE)
+# test.combined <- RunUMAP(test.combined, reduction = "pca", dims = 1:30)
+#
+# p1 <- DimPlot(test.combined, reduction = "umap", group.by = "bn")
+# p2 <- DimPlot(test.combined, reduction = "umap", group.by = "seurat_annotations", label = TRUE, repel = TRUE)
+# p1
+# p2
