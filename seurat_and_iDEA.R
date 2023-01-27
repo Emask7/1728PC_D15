@@ -111,10 +111,11 @@ library(cowplot)
   cohort2.combined <- RunPCA(cohort2.combined, verbose = FALSE)
   cohort2.combined <- RunUMAP(cohort2.combined, reduction = "pca", dims = 1:30)
 
-
-
   p1 <- DimPlot(cohort1.combined, reduction = "umap", group.by = "bn")
   p1
+
+  p2 <- DimPlot(cohort2.combined, reduction = "umap", group.by = "bn")
+  p2
 
 # test.combined <- RunPCA(test.combined, verbose = FALSE)
 # test.combined <- RunUMAP(test.combined, reduction = "pca", dims = 1:30)
