@@ -82,12 +82,6 @@ library(cowplot)
     # Select integration features
       features <- SelectIntegrationFeatures(object.list = data.list, nfeatures = 3000)
 
-    # Reciprocal PCA
-      data.list <- lapply(X = data.list, FUN = function(x) {
-        x <- ScaleData(x, features = features, verbose = FALSE)
-        x <- RunPCA(x, features = features, verbose = FALSE)
-      })
-
     # Run the PrepSCTIntegration() function prior to identifying anchors
       data.list <- PrepSCTIntegration(object.list = data.list, anchor.features = features)
       data.list <- lapply(X = data.list, FUN = RunPCA, features = features)
@@ -95,25 +89,23 @@ library(cowplot)
     # Find integration anchors and integrate the data
       anchors <- FindIntegrationAnchors(object.list = data.list, normalization.method = "SCT",
                                         anchor.features = features, dims = 1:30, reduction = "rpca", k.anchor = 20)
-      data.combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT", dims = 1:30)
+      data.combined.sct <- IntegrateData(anchorset = anchors, normalization.method = "SCT", dims = 1:30)
 
+    # Run PCA and UMAP
+      data.combined.sct <- RunPCA(data.combined.sct, verbose = FALSE)
+      data.combined.sct <- RunUMAP(data.combined.sct, reduction = "pca", dims = 1:30)
+    
     # Return integrated data
-      data.combined
+      data.combined.sct
   }
 
 # test.combined <- run_seurat(test)
 
   cohort1.combined <- run_seurat(cohort1)
-  cohort1.combined <- RunPCA(cohort1.combined, verbose = FALSE)
-  cohort1.combined <- RunUMAP(cohort1.combined, reduction = "pca", dims = 1:30)
-
-  cohort2.combined <- run_seurat(cohort2)
-  cohort2.combined <- RunPCA(cohort2.combined, verbose = FALSE)
-  cohort2.combined <- RunUMAP(cohort2.combined, reduction = "pca", dims = 1:30)
-
   p1 <- DimPlot(cohort1.combined, reduction = "umap", group.by = "bn")
   p1
 
+  cohort2.combined <- run_seurat(cohort2)
   p2 <- DimPlot(cohort2.combined, reduction = "umap", group.by = "bn")
   p2
 
